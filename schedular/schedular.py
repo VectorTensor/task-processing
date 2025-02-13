@@ -1,42 +1,31 @@
 import redis
 import time
 import json
-import random
-from sqlalchemy import create_engine, Column, BigInteger, JSON, Enum, TIMESTAMP, text
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+import sys
+import os
 
-Base = declarative_base()
+module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../models"))
+sys.path.append(module_path)
 
-class Task(Base):
-    __tablename__ = 'tasks'
-    
-    id = Column(BigInteger, primary_key=True, autoincrement=True)
-    data = Column(JSON, nullable=False)
-    status = Column(Enum('pending', 'processing', 'completed', 'failed', name='task_status'), default='pending')
-    created_at = Column(TIMESTAMP, server_default=text('CURRENT_TIMESTAMP'))
-    updated_at = Column(TIMESTAMP, server_default=text('CURRENT_TIMESTAMP'), onupdate=text('CURRENT_TIMESTAMP'))
-
-# Database connection
-DATABASE_URL = "mysql+pymysql://user:password@localhost/mydatabase"
-engine = create_engine(DATABASE_URL, echo=True)
-SessionLocal = sessionmaker(bind=engine)
-Base.metadata.create_all(engine)
-
-# Query pending tasks
-def get_pending_tasks():
-    session = SessionLocal()
-    try:
-        pending_tasks = session.query(Task).filter(Task.status == 'pending').all()
-        return pending_tasks
-    finally:
-        session.close()
+from db_models import update_task_status,get_pending_tasks
 redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
 
+
 def produce(task):
-    message = data
+    try:
+        message = {
+            "id": task.id,
+            "message": task.data["message"],
+            "time": task.data["time"]
+        }
+    except KeyError as e:
+        print(f"error occured: {e}")
+        return
     redis_client.lpush('task_queue', json.dumps(message))
+    update_task_status(task.id, "processing")
+
     print(f"Produced: {message}")
+
 
 if __name__ == "__main__":
     # produce()
@@ -45,5 +34,5 @@ if __name__ == "__main__":
         tasks = get_pending_tasks()
 
         for task in tasks:
-            produce(task.data)
+            produce(task)
         time.sleep(5)
