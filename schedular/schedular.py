@@ -16,7 +16,8 @@ def produce(task):
         message = {
             "id": task.id,
             "message": task.data["message"],
-            "time": task.data["time"]
+            "time": task.data["time"],
+            "tries": 0
         }
     except KeyError as e:
         print(f"error occured: {e}")

@@ -5,6 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 Base = declarative_base()
+import logging
 
 
 class Task(Base):
@@ -21,10 +22,11 @@ class Task(Base):
 
 # Database connection
 DATABASE_URL = "mysql+pymysql://user:password@localhost/mydatabase"
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL, echo=False)
 SessionLocal = sessionmaker(bind=engine)
 Base.metadata.create_all(engine)
 
+logging.getLogger("sqlalchemy").setLevel(logging.WARNING)
 # Query pending tasks
 
 

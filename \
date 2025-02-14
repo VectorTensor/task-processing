@@ -11,38 +11,42 @@ sys.path.append(module_path)
 from db_models import update_task_status, get_pending_tasks
 
 redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
-MAX_RETRIES = 3 
-
-
+MAX_RETRIES = 3
 def consume():
     while True:
-        _, message = redis_client.brpop('task_queue')
-        decoded_message = json.loads(message)
+        message = redis_client.zrangebyscore('task_queue',0, time.time())
+        if len(message) == 0:
+            continue
+        print(message[0])
+        decoded_message = json.loads(message[0])
         print("Processing message...")
+
         tries = decoded_message['tries']
-        tries += 1
+        tries += 1 
         decoded_message['tries'] = tries
 
         try:
-            if random.random() < 0.01:
-                t = decoded_message['time']
+            t = decoded_message['time']
+            redis_client.zadd('task_queue',{json.dumps(decoded_message):time.time() + 2+ t})
+            if random.random() < 0.8:
                 time.sleep(t)
-                print(f"task completed {decoded_message['id']}: {decoded_message['message']}")
+                print(f"task completed {decoded_message['id']}")
                 update_task_status(decoded_message['id'], "completed")
+                redis_client.lrem('task_queue',1,json.dumps(decoded_message))
             else:
-                # simulate execption
                 raise Exception("simulated exception")
 
+
         except Exception as e:
-            print(f"Task failed : {e}")
-            if tries < MAX_RETRIES:
-                redis_client.lpush("task_queue", json.dumps(decoded_message))
-            else:
+            print(f"Json decode error {e}")
+            if tries > MAX_RETRIES:
                 redis_client.lpush("dead-letter-queue", json.dumps(decoded_message))
+            else:
+                redis_client.zadd('task_queue',{json.dumps(decoded_message):time.time() })
 
             continue
 
-        # print(f"Consumed: {message}")
+        print(f"Consumed: {message}")
 
 
 if __name__ == "__main__":
