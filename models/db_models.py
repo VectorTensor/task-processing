@@ -38,8 +38,6 @@ def get_pending_tasks():
         session.close()
 
 
-
-
 def update_task_status(task_id, new_status):
     session = SessionLocal()
     try:
