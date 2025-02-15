@@ -34,4 +34,4 @@ if __name__ == "__main__":
 
         for task in tasks:
             produce(task)
-        time.sleep(5)
+        time.sleep(5) # poll every 5 seconds
