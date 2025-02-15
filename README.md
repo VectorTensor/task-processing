@@ -44,7 +44,7 @@ The Task Processing System is a distributed system designed to handle task sched
 1. Clone the repository:
    ```sh
    git clone <repo_url>
-   cd task-processing-system
+   cd task-processing
    ```
 2. Go to task-processing-services build docker compose
      ```sh
