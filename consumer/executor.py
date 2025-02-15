@@ -18,13 +18,13 @@ def consume():
     while True:
         _, message = redis_client.brpop('task_queue')
         decoded_message = json.loads(message)
-        print("Processing message...")
+        print(f"Processing message task : {decoded_message['id']}...")
         tries = decoded_message['tries']
         tries += 1
         decoded_message['tries'] = tries
 
         try:
-            if random.random() < 0.01:
+            if random.random() < 0.80:
                 t = decoded_message['time']
                 time.sleep(t)
                 print(f"task completed {decoded_message['id']}: {decoded_message['message']}")

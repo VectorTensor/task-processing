@@ -4,11 +4,9 @@ import json
 import sys
 import os
 
-module_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../models"))
-sys.path.append(module_path)
 
-from db_models import update_task_status,get_pending_tasks
-redis_client = redis.Redis(host='localhost', port=6379, decode_responses=True)
+from models.db_models import update_task_status,get_pending_tasks
+redis_client = redis.Redis(host='redis', port=6379, decode_responses=True)
 
 
 def produce(task):

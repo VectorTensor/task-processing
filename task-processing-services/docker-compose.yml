@@ -24,18 +24,37 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
 
-  zookeeper:
-    image: bitnami/zookeeper:latest
-    container_name: zookeeper_service
-    restart: unless-stopped
-    environment:
-      ALLOW_ANONYMOUS_LOGIN: "yes"
+  task_insert:
+    build: ../task-insert-service/
+    command: sh -c "sleep 10 && uvicorn task_insert_app:app --host 0.0.0.0 --port 8000 --reload"
+    container_name: task_insert
     ports:
-      - "2181:2181"
-    volumes:
-      - zookeeper_data:/bitnami/zookeeper
+      - 8000:8000
+    depends_on:
+      - mysql
+
+  task_schedular:
+    build: ../schedular/ 
+    command: sh -c "sleep 10 && python schedular.py"
+    container_name: task_schedular
+    depends_on:
+      - mysql
+      - redis
+
+
+
+  dlq_processor:
+    build: ../dlq-process/ 
+    command: sh -c "sleep 10 && python dlq_processor.py"
+    container_name: dlq_processor 
+    depends_on:
+      - mysql
+      - redis
+
+
+
+
 
 volumes:
   redis_data:
   mysql_data:
-  zookeeper_data:
