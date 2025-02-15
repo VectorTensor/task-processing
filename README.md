@@ -1,8 +1,8 @@
 ## Task Processing System
 
 ## Overview
-The Task Processing System is a distributed system designed to handle task scheduling, queuing, and execution efficiently. It consists of multiple services that work together to process tasks reliably.
-
+The Task Processing System is a distributed system designed to handle task scheduling, queuing, and execution efficiently. It consists of multiple services that work together to process tasks reliably. I haven't used .env variables for storing database credentials
+which is a bad practice, but it makes building this much simple. I wanted to make building and running it very simple. 
 ## Components
 
 ### 1. **Consumer**
@@ -58,7 +58,7 @@ The Task Processing System is a distributed system designed to handle task sched
     curl --location 'http://0.0.0.0:8000/tasks/' \
     --header 'Content-Type: application/json' \
     --data '{
-        "message":"spiderman 3",
+        "message":"gojo wins against sukuna ",
         "time":3
     }'
     ```
