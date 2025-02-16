@@ -1,8 +1,7 @@
 ## Task Processing System
 
 ## Overview
-The Task Processing System is a distributed system designed to handle task scheduling, queuing, and execution efficiently. It consists of multiple services that work together to process tasks reliably. I haven't used .env variables for storing database credentials
-which is a bad practice, but it makes building this much simple. I wanted to make building and running it very simple. 
+The Task Processing System is a distributed system designed to handle task scheduling, queuing, and execution efficiently. It consists of multiple services that work together to process tasks reliably. It is very simple to build no need to edit any configs just follow the steps.
 ## Components
 
 ### 1. **Consumer**
